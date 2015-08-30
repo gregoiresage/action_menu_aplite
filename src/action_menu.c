@@ -3,6 +3,13 @@
 #ifdef PBL_SDK_2
 #include "action_menu.h"
 
+#define ACTION_MENU_FONT_SMALL  FONT_KEY_GOTHIC_18_BOLD
+#define ACTION_MENU_FONT_NORMAL FONT_KEY_GOTHIC_24_BOLD
+#define ACTION_MENU_FONT_BIG    FONT_KEY_GOTHIC_28_BOLD
+
+// Choose you favourite font size
+#define ACTION_MENU_FONT ACTION_MENU_FONT_NORMAL
+
 struct ActionMenuItem {
   char *label;
   void *action_data;
@@ -228,11 +235,11 @@ static int16_t cb_get_cell_height(MenuLayer *ml, MenuIndex *i_cell, void *ctx) {
   GSize size = 
     graphics_text_layout_get_content_size( 
       menu->current_level->items[i_cell->row]->label, 
-      fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
-      GRect(0,0,144,168), 
+      fonts_get_system_font(ACTION_MENU_FONT), 
+      GRect(0,0,144 - MENU_LAYER_OFFSET - 16,168), 
       GTextOverflowModeWordWrap, GTextAlignmentLeft);
 
-  return size.h + 16;
+  return size.h + 8 + 8;
 }
 
 static void cb_draw_row(GContext *g_ctx, const Layer *l_cell, MenuIndex *i_cell, void *ctx) {
@@ -242,25 +249,23 @@ static void cb_draw_row(GContext *g_ctx, const Layer *l_cell, MenuIndex *i_cell,
   if(menu_layer_get_selected_index(menu->menulayer).row == i_cell->row) {
     graphics_context_set_fill_color(g_ctx, GColorWhite);
     graphics_fill_rect(g_ctx, bounds, 0, GCornerNone);
-
-    bounds.origin.x += 4;
-    bounds.size.w -= 2*4;
-    graphics_context_set_fill_color(g_ctx, GColorBlack);
-    graphics_fill_rect(g_ctx, bounds, 4, GCornersAll);
-
-    graphics_context_set_text_color(g_ctx, GColorWhite);
-    bounds.origin.y += 4;
-  }
-  else {
-    bounds.origin.x += 4;
-    bounds.origin.y += 4;
   }
 
   bounds.origin.x += 4;
+  bounds.size.w -= 2*4;
+
+  graphics_context_set_fill_color(g_ctx, GColorBlack);
+  graphics_fill_rect(g_ctx, bounds, 4, GCornersAll);
+
+  bounds.size.w -= 2*4;
+  bounds.origin.x += 4;
+
+  bounds.origin.y += 4;
+  bounds.size.h -= 2*4;
 
   graphics_draw_text(g_ctx,
     menu->current_level->items[i_cell->row]->label,
-    fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
+    fonts_get_system_font(ACTION_MENU_FONT),
     bounds,
     GTextOverflowModeWordWrap,
     GTextAlignmentLeft,
@@ -270,7 +275,7 @@ static void cb_draw_row(GContext *g_ctx, const Layer *l_cell, MenuIndex *i_cell,
     if(menu->arrow_image == NULL){
       menu->arrow_image = gbitmap_create_with_data(ARROW_IMAGE_DATA);
     }
-    graphics_draw_bitmap_in_rect(g_ctx, menu->arrow_image, (GRect){.origin={116, bounds.origin.y + bounds.size.h / 2 - 6},.size={7,5}});
+    graphics_draw_bitmap_in_rect(g_ctx, menu->arrow_image, (GRect){.origin={116, bounds.origin.y + (bounds.size.h - 4) / 2},.size={7,5}});
   }
 }
 
@@ -405,7 +410,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context)   {
   if(menu->frozen)
     return;
 
-  menu_layer_set_selected_next(menu->menulayer, true, MenuRowAlignNone, true);
+  menu_layer_set_selected_next(menu->menulayer, true, MenuRowAlignCenter, true);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -414,7 +419,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   if(menu->frozen)
     return;
 
-  menu_layer_set_selected_next(menu->menulayer, false, MenuRowAlignNone, true);
+  menu_layer_set_selected_next(menu->menulayer, false, MenuRowAlignCenter, true);
 }
 
 static void back_click_handler(ClickRecognizerRef recognizer, void *context) {
