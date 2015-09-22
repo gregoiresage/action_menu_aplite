@@ -348,9 +348,9 @@ static void animation_out_stopped(Animation *animation, bool finished, void *dat
 
   menu->current_level = menu->tmp_level;
   menu->tmp_level = NULL;
-  menu_layer_set_selected_index(menu->menulayer, (MenuIndex){0,0}, MenuRowAlignTop, false);
   menu_layer_reload_data(menu->menulayer);
-
+  menu_layer_set_selected_index(menu->menulayer, (MenuIndex){0,0}, MenuRowAlignTop, false);
+  
   animate_menu(menu);
 }
 
